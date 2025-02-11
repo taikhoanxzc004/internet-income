@@ -5,7 +5,7 @@ import random
 import socket
 import glob
 
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxC6bGQBIzys_5ZUBxT3MbyXUJ3mjzzCFrcZVJmXZeH6Adz_k_7Vg3NXrTpUxaj9BSmGQ/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrS6YxYVuNFBx1XToDTYjbpSAKcrHklbmahzIsY5BHdTSxVzRKd9xW_mqxYnsC7EV82w/exec"
 
 def get_public_ip():
     try:
@@ -37,7 +37,7 @@ for i in range(max_retries):
     response = requests.post(GOOGLE_SCRIPT_URL, json=data)
     print("Gửi dữ liệu lần {}: {}".format(i + 1, response.text))
 
-    if "Success" in response.text:
-        break
+    if "Success" in response.text or "Duplicate Wallet - Skipped" in response.text:
+        break  # Không cần gửi lại nếu đã thành công hoặc bị trùng
     else:
         time.sleep(random.uniform(1, 3))
