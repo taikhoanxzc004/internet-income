@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 import requests
 import json
 import time
 import random
 import subprocess
 
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzheORxCn8a9IksFzlH7OVWYu49zPv58lmmdY37MEtNzWJdgXlKhEnpIhSih1hgZhQvYQ/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxp571hXbW6gezLdCe5aImBe6MkoGYYNopUWx0QAvKy7gtK1uniYIj5RDNrnqNPo6h1XA/exec"
 
 def get_public_ipv4():
     """ Lấy địa chỉ IPv4 chính xác """
