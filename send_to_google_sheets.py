@@ -3,7 +3,7 @@ import json
 import requests
 
 # ==== CẤU HÌNH URL GOOGLE APPS SCRIPT ====
-WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwDvttxQWjeUuP4wmBRYwXMYr6jzNWT29E0oCsum_4GSuPt4VraDqQgZ2wD6LrojirdpQ/exec"  # Thay XXX bằng URL của bạn
+WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbydCb0IBpP2j2VInqIcLJdkjTV4QzkF5M0W7aDgLQwWSSyeV_hfbN3tJIglItsARwQ1uA/exec"  # Thay XXX bằng URL của bạn
 
 # ==== HÀM LẤY CHÍNH XÁC IP V4 ====
 def get_ipv4():
