@@ -23,11 +23,18 @@ wallet_json = subprocess.run(
     shell=True, capture_output=True, text=True
 ).stdout.strip()
 
+# Kiểm tra nội dung wallet_json
+if not wallet_json:
+    print("LỖI: Dữ liệu remember.json trống!")
+    exit(1)  # Dừng chương trình nếu không có dữ liệu
+
 try:
-    wallet_data = json.loads(wallet_json)  # Giữ nguyên toàn bộ nội dung
+    wallet_data = json.loads(wallet_json)
 except json.JSONDecodeError:
-    print("LỖI: Không thể đọc dữ liệu từ remember.json!")
-    wallet_data = {}
+    print("LỖI: Không thể đọc JSON từ remember.json!")
+    print("Dữ liệu nhận được:", wallet_json)  # In nội dung để debug
+    exit(1)
+
 
 # Lấy tên file UTC-*
 utc_file = subprocess.run(
