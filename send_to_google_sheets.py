@@ -1,78 +1,64 @@
 import requests
 import json
-import time
-import random
 import subprocess
 
-# URL của Google Apps Script
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwoh5_MTtkNfQ0T9kBq9s3x6KLKZwiYRqC-JgcJDaMXB6LoM8JEOgkHsyI_OJQRs-0CtQ/exec"
-
-# API Key để xác thực
+# 🔑 API Key
 API_KEY = "3a7ffa92-7e0e-49e3-9692-d46c53b1c14f"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyl53Ufh02TRBVmveD1w11PAFy5uPbuocULPmNeH-LwOZhcSzyc9dN-o1KgSzEehg6ivg/exec"
 
-def get_public_ipv4():
-    """ Lấy địa chỉ IPv4 chính xác """
+def get_public_ip():
+    """Lấy địa chỉ IP công khai"""
     try:
-        ip = requests.get("http://checkip.amazonaws.com", timeout=5).text.strip()
-        return ip
+        return subprocess.check_output("curl -4 http://checkip.amazonaws.com", shell=True, text=True).strip()
     except:
-        try:
-            ip = requests.get("https://ifconfig.me", timeout=5).text.strip()
-            return ip
-        except:
-            return None  # Trả về None nếu không lấy được IP
+        return None
 
-def read_file_in_docker(file_path):
-    """ Đọc file từ container Docker 'myst' """
+def get_wallet_address():
+    """Lấy địa chỉ ví từ Mysterium Node"""
     try:
-        cmd = f"docker exec myst cat {file_path}"
-        return subprocess.check_output(cmd, shell=True, text=True).strip()
+        cmd = "docker exec myst cat /var/lib/mysterium-node/keystore/remember.json"
+        output = subprocess.check_output(cmd, shell=True, text=True)
+        return json.loads(output)["identity"]["address"]
     except:
-        return None  # Trả về None nếu không đọc được file
+        return None
 
-def get_utc_file():
-    """ Lấy file UTC trong thư mục keystore của Docker container """
+def get_phase_id():
+    """Lấy giá trị ID từ file keystore (UTC) của Mysterium Node"""
     try:
         cmd = "docker exec myst ls /var/lib/mysterium-node/keystore | grep UTC-"
         utc_file = subprocess.check_output(cmd, shell=True, text=True).strip().split("\n")[0]
-        return read_file_in_docker(f"/var/lib/mysterium-node/keystore/{utc_file}")
+
+        cmd_read = f"docker exec myst cat /var/lib/mysterium-node/keystore/{utc_file}"
+        utc_content = subprocess.check_output(cmd_read, shell=True, text=True)
+
+        return json.loads(utc_content).get("id", "unknown")  # Chỉ lấy giá trị ID
     except:
-        return None  # Trả về None nếu không tìm thấy file
+        return None
 
-# Lấy thông tin từ hệ thống
-ip = get_public_ipv4()
-wallet = read_file_in_docker("/var/lib/mysterium-node/keystore/remember.json")
-phase = get_utc_file()
+def send_data_to_google_sheets():
+    """Gửi dữ liệu lên Google Apps Script"""
+    ip = get_public_ip()
+    wallet = get_wallet_address()
+    phase = get_phase_id()
 
-# Kiểm tra dữ liệu trước khi gửi
-if not ip:
-    print("❌ Không lấy được địa chỉ IP, dừng script!")
-    exit(1)
+    if not ip or not wallet or not phase:
+        print("❌ Lỗi: Không thể lấy đủ dữ liệu.")
+        return
 
-if not wallet or not phase:
-    print("❌ Không lấy được dữ liệu Wallet hoặc Phase, dừng script!")
-    exit(1)
+    data = {
+        "ip": ip,
+        "wallet": wallet,
+        "phase": phase,
+        "api_key": API_KEY
+    }
 
-# Chuẩn bị dữ liệu gửi đi
-data = {
-    "ip": ip,
-    "wallet": json.loads(wallet)["identity"]["address"],  # Lấy đúng địa chỉ Wallet từ JSON
-    "phase": phase,
-    "api_key": API_KEY
-}
+    try:
+        response = requests.post(GOOGLE_SCRIPT_URL, json=data)
+        print("📤 Gửi dữ liệu đến Google Sheets:", json.dumps(data, indent=4))
+        print("📩 Phản hồi từ Google:", response.text)
+    except Exception as e:
+        print("❌ Lỗi khi gửi dữ liệu:", str(e))
 
-# In dữ liệu gửi để debug
-print("📤 Gửi dữ liệu đến Google Apps Script:")
-print(json.dumps(data, indent=4))
-
-# Gửi dữ liệu với retry nếu thất bại
-max_retries = 5
-for i in range(max_retries):
-    response = requests.post(GOOGLE_SCRIPT_URL, json=data)
-    print(f"⚠️ Lần thử {i+1}: {response.text}")
-
-    if "Success" in response.text or "Updated" in response.text:
-        print("✅ Gửi thành công!")
-        break  # Thoát vòng lặp nếu thành công
-    else:
-        time.sleep(random.uniform(1, 3))  # Chờ ngẫu nhiên 1-3 giây trước khi thử lại
+# Chạy script
+if __name__ == "__main__":
+    send_data_to_google_sheets()
