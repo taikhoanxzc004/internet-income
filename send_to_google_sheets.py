@@ -4,7 +4,7 @@ import subprocess
 
 # 🔑 API Key
 API_KEY = "3a7ffa92-7e0e-49e3-9692-d46c53b1c14f"
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_BBoZU8Y3dj5GmxDWyABYBh1vzt1RuT29JlGd7ei_hA5D0aYB-FlznJUdEj03rAjq8Q/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwn7HrF4rMMFHR3Bf3yGh3901JlNS4UFjqNW7G1d1r4qpnsYErHzhnGefhKHSiVFT_2Q/exec"
 
 def get_public_ip():
     """Lấy địa chỉ IP công khai"""
