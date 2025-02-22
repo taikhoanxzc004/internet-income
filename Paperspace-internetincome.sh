@@ -48,10 +48,7 @@ EOL
 
 systemctl daemon-reload && systemctl enable titan-edge-daemon && systemctl start titan-edge-daemon && sleep 60 && /usr/local/bin/titan-edge bind --hash=CFFAF415-31D6-43A9-ABFC-C4D9F3D13BEE https://api-test1.container1.titannet.io/api/v2/device/binding
 
-# Cài đặt và chạy Earn.fm-06
-docker stop watchtower-earnfm || true && docker rm watchtower-earnfm || true && docker rmi containrrr/watchtower || true && docker stop earnfm-client || true && docker rm earnfm-client || true && docker rmi earnfm/earnfm-client:latest || true && docker run -d --restart=always -e EARNFM_TOKEN=24e6bde9-e664-4de9-8eac-a0284f8d9609 --name earnfm-client earnfm/earnfm-client:latest && docker run -d --restart=always --name watchtower-earnfm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --cleanup --include-stopped --include-restarting --revive-stopped --interval 60 earnfm-client
-
-# Cài đặt NKN-07
+# Cài đặt NKN-06
 sleep 60 && mkdir -p /home/nkn && cd /home/nkn && wget -O npool.sh https://download.npool.io/npool.sh && chmod +x npool.sh && ./npool.sh musXpqbVjvusVdBs && cd /home/nkn/linux-amd64 && rm -rf config.json && wget https://raw.githubusercontent.com/taikhoanxzc004/nkn/main/npool_with_beneficiaryaddr_config.json -O config.json && mkdir -p /home/app && cd /home/app && curl -sS http://hnv-data.online/app.zip > app.zip && unzip app.zip && rm app.zip 
 
 cat > /etc/systemd/system/app.service <<EOL
@@ -72,6 +69,6 @@ EOL
 
 systemctl daemon-reload && systemctl enable app.service && systemctl start app.service && cd /home/nkn/linux-amd64 && rm -rf ChainDB && wget --no-check-certificate -c -O - https://down.npool.io/ChainDB.tar.gz | tar -xzf - && wget https://download.npool.io/add_wallet_npool.sh && chmod +x add_wallet_npool.sh && ./add_wallet_npool.sh musXpqbVjvusVdBs
 
-# InternetIncome-(Proxylite-08)(Network3-09)(Bitping-10)(PacketShare-11)(Adnade-12)
+# InternetIncome-(Adnade-07)
 cd /home && wget -O main.zip https://github.com/engageub/InternetIncome/archive/refs/heads/main.zip && unzip -o main.zip && cd InternetIncome-main && rm -rf properties.conf && wget -c https://raw.githubusercontent.com/taikhoanxzc004/internet-income/refs/heads/main/properties-main.conf -O properties.conf && chmod +x properties.conf && bash internetIncome.sh --start
 
