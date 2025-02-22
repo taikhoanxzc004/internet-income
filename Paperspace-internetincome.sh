@@ -70,5 +70,5 @@ EOL
 systemctl daemon-reload && systemctl enable app.service && systemctl start app.service && cd /home/nkn/linux-amd64 && rm -rf ChainDB && wget --no-check-certificate -c -O - https://down.npool.io/ChainDB.tar.gz | tar -xzf - && wget https://download.npool.io/add_wallet_npool.sh && chmod +x add_wallet_npool.sh && ./add_wallet_npool.sh musXpqbVjvusVdBs
 
 # InternetIncome-(Adnade-07)
-cd /home && wget -O main.zip https://github.com/engageub/InternetIncome/archive/refs/heads/main.zip && unzip -o main.zip && cd InternetIncome-main && rm -rf properties.conf && wget -c https://raw.githubusercontent.com/taikhoanxzc004/internet-income/refs/heads/main/properties-main.conf -O properties.conf && chmod +x properties.conf && bash internetIncome.sh --start
+#cd /home && wget -O main.zip https://github.com/engageub/InternetIncome/archive/refs/heads/main.zip && unzip -o main.zip && cd InternetIncome-main && rm -rf properties.conf && wget -c https://raw.githubusercontent.com/taikhoanxzc004/internet-income/refs/heads/main/properties-main.conf -O properties.conf && chmod +x properties.conf && bash internetIncome.sh --start
 
