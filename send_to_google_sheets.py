@@ -2,7 +2,7 @@ import subprocess
 import json
 import requests
 
-WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyLEYqz7ZHdAA00noVtr-ItbK19eHmUknQ4eGs5le31CNj_rSfuo5uvIjAeQirBtPQJxw/exec"
+WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwLHMoFqrgsnabKeFaFez-nwRmQ5lqiEJSr4TuNu780A5_dSPdpMdaSUE5Lr9ng5p7HQQ/exec"
 
 def get_ipv4():
     try:
