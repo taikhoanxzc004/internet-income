@@ -91,7 +91,7 @@ curl -L -X POST -H "Content-Type: application/json" \
     "https://script.google.com/macros/s/AKfycbwlopX4pez19tjR7vGYfyWEPtOdkSgHtmBScEHsFvYsA6LngwBpoUEKauDAcN9zdYltrg/exec"
 
 # Restart MYST
-sleep 60 && docker restart myst
+sleep 300 && docker restart myst
 
 # Cài đặt và chạy Repocket-02
 docker pull repocket/repocket:latest && docker run --name repocket -e RP_EMAIL=heatherboreharrington@gmail.com -e RP_API_KEY=1a84a7bc-c857-4345-98e9-0db06251a4bb -d --restart=always repocket/repocket
