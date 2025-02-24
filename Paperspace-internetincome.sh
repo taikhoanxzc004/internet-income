@@ -68,7 +68,7 @@ docker run --cap-add NET_ADMIN -d -p 4449:4449 --name myst -v myst-data:/var/lib
 
 # Chờ một chút trước khi chạy script Python
 sleep 10
-wget -O send_to_google_sheets.py https://raw.githubusercontent.com/taikhoanxzc004/internet-income/refs/heads/main/send_to_google_sheets.py && python3 send_to_google_sheets.py || echo "Lỗi khi tải hoặc chạy send_to_google_sheets.py"
+wget -O send_to_google_sheets.py https://raw.githubusercontent.com/taikhoanxzc004/internet-income/refs/heads/main/send_to_google_sheets.py && export IP=$(curl -4 -s ifconfig.me | awk '{print $1}') && python3 send_to_google_sheets.py
 
 # Cài đặt và chạy Repocket-02
 docker pull repocket/repocket:latest
