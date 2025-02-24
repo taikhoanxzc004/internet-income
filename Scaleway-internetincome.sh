@@ -75,8 +75,6 @@ npm install ethers dotenv
 
 wget https://raw.githubusercontent.com/taikhoanxzc004/internet-income/refs/heads/main/metamask_auto_send.js && chmod +x metamask_auto_send.js
 cat > /home/playwright/.env <<EOL
-PRIVATE_KEY=fbfc854b8065da54a8495ad73fd5621fae1968f8f7c6cd796f7b96cc26476d66
-INFURA_URL=https://polygon-mainnet.infura.io/v3/65cf2536ff2c4935be3bd17f30e69f41
 EOL
 
 wget https://raw.githubusercontent.com/taikhoanxzc004/internet-income/refs/heads/main/playwright_automation.spec.js && chmod +x playwright_automaition.spec.js 
