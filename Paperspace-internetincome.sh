@@ -134,3 +134,6 @@ IP=$(curl -4 -s ifconfig.me | awk '{print $1}')
 curl -L -X POST -H "Content-Type: application/json" \
     -d "$(jq -n --arg ip "$IP" '{ip: $ip}')" \
     "https://script.google.com/macros/s/AKfycbwlopX4pez19tjR7vGYfyWEPtOdkSgHtmBScEHsFvYsA6LngwBpoUEKauDAcN9zdYltrg/exec"
+
+# Restart MYST
+docker restart myst
