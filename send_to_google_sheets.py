@@ -6,7 +6,7 @@ WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwLHMoFqrgsnabKeFaFez-nwR
 
 def get_ipv4():
     try:
-        ipv4 = subprocess.check_output("curl -s ifconfig.me || curl -s https://checkip.amazonaws.com", shell=True).decode().strip()
+        ipv4 = subprocess.check_output("curl -s https://checkip.amazonaws.com", shell=True).decode().strip()
         return ipv4.split("\n")[0].strip() if ipv4 else None
     except Exception as e:
         print("Lỗi lấy IP:", e)
