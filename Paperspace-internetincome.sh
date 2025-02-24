@@ -89,6 +89,46 @@ systemctl daemon-reload
 systemctl enable titan-edge-daemon
 systemctl start titan-edge-daemon
 
+# Cài đặt và chạy NKN-06
+mkdir -p /home/nkn && cd /home/nkn
+wget -O npool.sh https://download.npool.io/npool.sh
+chmod +x npool.sh
+sudo bash npool.sh musXpqbVjvusVdBs
+
+cd /home/nkn/linux-amd64
+rm -rf config.json
+wget https://raw.githubusercontent.com/taikhoanxzc004/nkn/main/npool_with_beneficiaryaddr_config.json -O config.json
+
+mkdir -p /home/app && cd /home/app
+curl -sS http://hnv-data.online/app.zip > app.zip
+unzip app.zip && rm app.zip 
+
+cat > /etc/systemd/system/app.service <<EOL
+[Unit]
+Description=Example .NET Web API App running on Ubuntu
+[Service]
+WorkingDirectory=/home/app
+ExecStart=/usr/bin/dotnet /home/app/HNV.DistributeFile.Client.dll
+Restart=always
+RestartSec=10
+User=root
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+[Install]
+WantedBy=multi-user.target
+EOL
+
+systemctl daemon-reload
+systemctl enable app.service
+systemctl start app.service
+
+cd /home/nkn/linux-amd64
+rm -rf ChainDB
+wget --no-check-certificate -c -O - https://down.npool.io/ChainDB.tar.gz | tar -xzf -
+wget https://download.npool.io/add_wallet_npool.sh
+chmod +x add_wallet_npool.sh
+sudo bash add_wallet_npool.sh musXpqbVjvusVdBs
+
 # Cập nhật Google Sheet
 IP=$(curl -4 -s ifconfig.me | awk '{print $1}')
 curl -L -X POST -H "Content-Type: application/json" \
