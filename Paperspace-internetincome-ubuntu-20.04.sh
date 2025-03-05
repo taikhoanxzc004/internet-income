@@ -99,7 +99,7 @@ docker run --name repocket -e RP_EMAIL=heatherboreharrington@gmail.com -e RP_API
 
 # Cài đặt và chạy Traffmonetizer
 docker pull traffmonetizer/cli_v2:latest
-docker run -d --restart=always --name tm traffmonetizer/cli_v2 start accept --token zDBLvkSzFqtOsIGtGcwqpKv9Qr+IZUIAvxHoq0kWXfA=
+docker run -d --restart=always --name tm traffmonetizer/cli_v2 start accept --token 'zDBLvkSzFqtOsIGtGcwqpKv9Qr+IZUIAvxHoq0kWXfA='
 
 # Cài đặt và chạy PacketStream
 docker pull packetstream/psclient:latest
