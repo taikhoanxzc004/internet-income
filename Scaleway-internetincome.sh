@@ -1,8 +1,10 @@
-# Install Firewall
-export DEBIAN_FRONTEND=noninteractive
-export NEEDRESTART_MODE=a
-export NEEDRESTART_SUSPEND=1
-iptables -P FORWARD ACCEPT && iptables -P INPUT ACCEPT && echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections && echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections && sudo apt install -y iptables-persistent && sudo netfilter-persistent save && sudo systemctl enable netfilter-persistent && sudo systemctl restart netfilter-persistent
+# Turn off promt needrestart v2+
+echo 'exit 0' > /usr/sbin/policy-rc.d
+echo "set auto_update true" >> /etc/needrestart/needrestart.conf
+echo "\$nrconf{restart} = 'a';" > /etc/needrestart/conf.d/custom.conf
+
+# Setting APT for no question when install
+echo 'DPkg::Options {"--force-confdef"; "--force-confold";}' > /etc/apt/apt.conf.d/99force-conf
 
 # Swap disk to ram
 sudo dd if=/dev/zero of=/swapfile bs=128MB count=32
@@ -11,13 +13,11 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 grep -qxF '/swapfile none swap sw 0 0' /etc/fstab || echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
-# Turn off promt needrestart v2+
-echo 'exit 0' > /usr/sbin/policy-rc.d
-echo "set auto_update true" >> /etc/needrestart/needrestart.conf
-echo "\$nrconf{restart} = 'a';" > /etc/needrestart/conf.d/custom.conf
-
-# Setting APT for no question when install
-echo 'DPkg::Options {"--force-confdef"; "--force-confold";}' > /etc/apt/apt.conf.d/99force-conf
+# Install Firewall
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+export NEEDRESTART_SUSPEND=1
+iptables -P FORWARD ACCEPT && iptables -P INPUT ACCEPT && echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections && echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections && sudo apt install -y iptables-persistent && sudo netfilter-persistent save && sudo systemctl enable netfilter-persistent && sudo systemctl restart netfilter-persistent
 
 # Update package
 apt-get update && apt-get upgrade -y 
