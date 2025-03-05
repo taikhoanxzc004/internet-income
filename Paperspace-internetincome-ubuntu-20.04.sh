@@ -25,17 +25,12 @@ sudo ufw --force enable && sudo ufw default allow incoming && sudo ufw default a
 sudo ufw reload
 iptables -P FORWARD ACCEPT
 iptables -P INPUT ACCEPT
-sudo apt update && sudo apt install -y iptables-persistent netfilter-persistent
+sudo apt update && apt-get upgrade -y && sudo apt install -y iptables-persistent netfilter-persistent
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
 sudo netfilter-persistent save
 sudo systemctl enable netfilter-persistent
 sudo systemctl restart netfilter-persistent
-
-
-
-# Cập nhật gói
-apt-get update && apt-get upgrade -y
 
 # Cài đặt các gói cần thiết
 DEBIAN_FRONTEND=noninteractive apt-get install -y \
