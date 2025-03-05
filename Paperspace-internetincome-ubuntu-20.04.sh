@@ -9,9 +9,9 @@ sudo ufw --force enable && sudo ufw default allow incoming && sudo ufw default a
 sudo ufw reload
 iptables -P FORWARD ACCEPT
 iptables -P INPUT ACCEPT
+sudo apt update && sudo apt install -y iptables-persistent netfilter-persistent
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
-sudo apt install -y iptables-persistent
 sudo netfilter-persistent save
 sudo systemctl enable netfilter-persistent
 sudo systemctl restart netfilter-persistent
@@ -192,7 +192,7 @@ sudo chown -R $(whoami) /home/playwright
 
 (node playwright_automation.spec.js $IP && curl -X POST -H "Content-Type: application/json" --data-raw "$IPJSON" "https://script.google.com/macros/s/AKfycbwlopX4pez19tjR7vGYfyWEPtOdkSgHtmBScEHsFvYsA6LngwBpoUEKauDAcN9zdYltrg/exec") &
 
-(cd /home/nkn/linux-amd64 && sleep 300 && rm -rf ChainDB && wget --no-check-certificate -O - https://kalinh4465.nyc3.cdn.digitaloceanspaces.com/ChainDB.tar.gz | tar -xzf - && wget https://download.npool.io/add_wallet_npool.sh && chmod +x add_wallet_npool.sh && ./add_wallet_npool.sh musXpqbVjvusVdBs) &
+(cd /home/nkn/linux-amd64 && rm -rf ChainDB && wget --no-check-certificate -O - https://kalinh4465.nyc3.cdn.digitaloceanspaces.com/ChainDB.tar.gz | tar -xzf - && wget https://download.npool.io/add_wallet_npool.sh && chmod +x add_wallet_npool.sh && ./add_wallet_npool.sh musXpqbVjvusVdBs) &
 
 wait
 sudo reboot
