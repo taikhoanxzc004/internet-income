@@ -4,6 +4,22 @@ export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 export NEEDRESTART_SUSPEND=1
 
+# Tắt prompt needrestart
+sudo apt update && apt install -y needrestart
+echo 'exit 0' > /usr/sbin/policy-rc.d
+echo "set auto_update true" >> /etc/needrestart/needrestart.conf
+echo "\$nrconf{restart} = 'a';" > /etc/needrestart/conf.d/custom.conf
+
+# Cấu hình APT để không hỏi khi cài đặt
+echo 'DPkg::Options {"--force-confdef"; "--force-confold";}' > /etc/apt/apt.conf.d/99force-conf
+
+# Cấu hình Swap
+sudo dd if=/dev/zero of=/swapfile bs=128MB count=32
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+grep -qxF '/swapfile none swap sw 0 0' /etc/fstab || echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+
 # Cài đặt và cấu hình Firewall
 sudo ufw --force enable && sudo ufw default allow incoming && sudo ufw default allow outgoing && sudo ufw allow proto udp from any to any
 sudo ufw reload
@@ -16,21 +32,7 @@ sudo netfilter-persistent save
 sudo systemctl enable netfilter-persistent
 sudo systemctl restart netfilter-persistent
 
-# Cấu hình Swap
-sudo dd if=/dev/zero of=/swapfile bs=128MB count=32
-sudo chmod 600 /swapfile
-sudo mkswap /swapfile
-sudo swapon /swapfile
-grep -qxF '/swapfile none swap sw 0 0' /etc/fstab || echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
-# Tắt prompt needrestart
-sudo apt update && apt install -y needrestart
-echo 'exit 0' > /usr/sbin/policy-rc.d
-echo "set auto_update true" >> /etc/needrestart/needrestart.conf
-echo "\$nrconf{restart} = 'a';" > /etc/needrestart/conf.d/custom.conf
-
-# Cấu hình APT để không hỏi khi cài đặt
-echo 'DPkg::Options {"--force-confdef"; "--force-confold";}' > /etc/apt/apt.conf.d/99force-conf
 
 # Cập nhật gói
 apt-get update && apt-get upgrade -y
